@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const auth = getAuth(app); //Authenticationのインスタンスを取得
 const db = getFirestore(app);
 
 export { auth, db };

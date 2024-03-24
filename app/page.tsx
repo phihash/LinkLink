@@ -1,50 +1,34 @@
-// app/page.tsx
 "use client";
-
-import { useState, useEffect } from "react";
-import { signInWithPopup, GoogleAuthProvider, User } from "firebase/auth";
+import Link from "next/link";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../lib/firebase";
+import Header from "@/components/Header";
 
-export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+const Home = () => {
+  const [user, loading] = useAuthState(auth);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-      // ログイン成功後の処理を記述
-    } catch (error) {
-      console.error("Googleログインエラー:", error);
-      // エラー処理を記述
-    }
-    setLoading(false);
+  const handleLogout = async () => {
+    await auth.signOut();
   };
+
+  if (loading) {
+    return <div>ローディング中</div>;
+  }
 
   return (
     <div>
+      <Header></Header>
       {user ? (
-        <div>
-          <p className="text-xl">ようこそ、{user.displayName}さん!</p>
-          <button className="bg-amber-400 p-4 rounded-xl" onClick={() => auth.signOut()}>ログアウト</button>
-        </div>
+        <>
+          <h1>Welcome, {user.displayName}!</h1>
+          <button onClick={handleLogout}>Logout</button>
+        </>
       ) : (
-        <button className="bg-red-400 p-4 rounded-xl" onClick={handleGoogleLogin} disabled={loading}>
-          {loading ? "ログイン中..." : "Googleでログイン"}
-        </button>
+        <>
+        </>
       )}
     </div>
   );
-}
+};
+
+export default Home;
